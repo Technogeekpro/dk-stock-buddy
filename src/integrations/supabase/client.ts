@@ -6,19 +6,21 @@ const SUPABASE_URL = "https://hmgtsqsfzbybdlxuytgw.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtZ3RzcXNmemJ5YmRseHV5dGd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzNjQzNjQsImV4cCI6MjA3MTk0MDM2NH0.wldueS_roypg-g9BstCxH9FjPZ61xgRUB8WpzbaZxIw";
 const SUPABASE_AUTH_STORAGE_KEY = "dk-stock-buddy-auth";
 const LEGACY_AUTH_STORAGE_KEY = "sb-hmgtsqsfzbybdlxuytgw-auth-token";
+const REMEMBER_LOGIN_KEY = "dk-stock-buddy-remember-login";
 const browserStorage = typeof window !== "undefined" ? window.localStorage : undefined;
 
-if (browserStorage && !browserStorage.getItem(SUPABASE_AUTH_STORAGE_KEY)) {
+if (browserStorage) {
   const legacySession = browserStorage.getItem(LEGACY_AUTH_STORAGE_KEY);
-  if (legacySession) {
-    browserStorage.setItem(SUPABASE_AUTH_STORAGE_KEY, legacySession);
+  if (legacySession && !browserStorage.getItem(SUPABASE_AUTH_STORAGE_KEY) && !window.sessionStorage.getItem(SUPABASE_AUTH_STORAGE_KEY)) {
+    const targetStorage = browserStorage.getItem(REMEMBER_LOGIN_KEY) === "false" ? window.sessionStorage : browserStorage;
+    targetStorage.setItem(SUPABASE_AUTH_STORAGE_KEY, legacySession);
   }
+  browserStorage.removeItem(LEGACY_AUTH_STORAGE_KEY);
 }
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-const REMEMBER_LOGIN_KEY = "dk-stock-buddy-remember-login";
 const SUPABASE_STORAGE_PREFIX = "sb-";
 
 const hasWindow = () => typeof window !== "undefined";
@@ -28,7 +30,7 @@ const getRememberedStoragePreference = () => {
     return true;
   }
 
-  return window.localStorage.getItem(REMEMBER_LOGIN_KEY) === "true";
+  return window.localStorage.getItem(REMEMBER_LOGIN_KEY) !== "false";
 };
 
 const getActiveStorage = () => {

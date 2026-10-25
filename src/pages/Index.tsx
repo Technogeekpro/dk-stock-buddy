@@ -113,7 +113,7 @@ const Index = () => {
             </button>
           ) : (
             <button 
-              onClick={() => supabase.auth.signOut()}
+              onClick={() => supabase.auth.signOut({ scope: "local" })}
               className="text-sm font-medium bg-primary-foreground/15 hover:bg-primary-foreground/25 active:bg-primary-foreground/30 px-4 py-2 rounded-full transition-all duration-200 active:scale-95"
             >
               Logout
